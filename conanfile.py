@@ -79,12 +79,16 @@ class OpenmeshConan(ConanFile):
         self.cpp_info.components["openmeshcore"].names["cmake_find_package"] = "OpenMeshCore"
         self.cpp_info.components["openmeshcore"].names["cmake_find_package_multi"] = "OpenMeshCore"
         self.cpp_info.components["openmeshcore"].libs = [self._get_decorated_lib("OpenMeshCore")]
+        if self.settings.os == "Linux":
+            self.cpp_info.components["openmeshcore"].system_libs.append("m")
         if self.settings.compiler == "Visual Studio":
             self.cpp_info.components["openmeshcore"].defines.append("_USE_MATH_DEFINES")
         # OpenMeshTools
         self.cpp_info.components["openmeshtools"].names["cmake_find_package"] = "OpenMeshTools"
         self.cpp_info.components["openmeshtools"].names["cmake_find_package_multi"] = "OpenMeshTools"
         self.cpp_info.components["openmeshtools"].libs = [self._get_decorated_lib("OpenMeshTools")]
+        if self.settings.os == "Linux":
+            self.cpp_info.components["openmeshtools"].system_libs.append("m")
         self.cpp_info.components["openmeshtools"].requires = ["openmeshcore"]
 
     def _get_decorated_lib(self, name):
