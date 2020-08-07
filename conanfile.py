@@ -79,6 +79,8 @@ class OpenmeshConan(ConanFile):
         self.cpp_info.components["openmeshcore"].names["cmake_find_package"] = "OpenMeshCore"
         self.cpp_info.components["openmeshcore"].names["cmake_find_package_multi"] = "OpenMeshCore"
         self.cpp_info.components["openmeshcore"].libs = [self._get_decorated_lib("OpenMeshCore")]
+        if self.settings.compiler == "Visual Studio":
+            self.cpp_info.components["openmeshcore"].defines.append("_USE_MATH_DEFINES")
         # OpenMeshTools
         self.cpp_info.components["openmeshtools"].names["cmake_find_package"] = "OpenMeshTools"
         self.cpp_info.components["openmeshtools"].names["cmake_find_package_multi"] = "OpenMeshTools"
