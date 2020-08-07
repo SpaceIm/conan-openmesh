@@ -1,6 +1,14 @@
 --- a/src/OpenMesh/Tools/Utils/Timer.cc
 +++ b/src/OpenMesh/Tools/Utils/Timer.cc
-@@ -85,6 +85,7 @@ public:
+@@ -62,7 +62,6 @@ namespace Utils {
+ 
+ // ----------------------------------------------------------------------------
+ 
+-using namespace std;
+ 
+ // -------------------------------------------------------------- TimerImpl ----
+ // just a base class for the implementation
+@@ -85,6 +84,7 @@ public:
  // ------------------------------------------------------------- windows 32 ----
  #if defined(WIN32) && (defined(_MSC_VER) || defined(__INTEL_COMPILER) || defined (__MINGW32__) )
  
