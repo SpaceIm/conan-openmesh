@@ -1,3 +1,4 @@
+import glob
 import os
 
 from conans import ConanFile, CMake, tools
@@ -10,7 +11,7 @@ class OpenmeshConan(ConanFile):
     topics = ("conan", "openmesh", "mesh", "structure", "geometry")
     homepage = "https://www.graphics.rwth-aachen.de/software/openmesh"
     url = "https://github.com/conan-io/conan-center-index"
-    exports_sources = "CMakeLists.txt"
+    exports_sources = ["CMakeLists.txt", "patches/**"]
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False], "fPIC": [True, False]}
@@ -41,12 +42,8 @@ class OpenmeshConan(ConanFile):
         os.rename("OpenMesh-" + self.version, self._source_subfolder)
 
     def build(self):
-        tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
-                              "if(\"${PROJECT_NAME}\" STREQUAL \"\")",
-                              "if(TRUE)")
-        tools.replace_in_file(os.path.join(self._source_subfolder, "cmake", "ACGCommon.cmake"),
-                              "set (ACG_PROJECT_BINDIR \".\")",
-                              "set (ACG_PROJECT_BINDIR \"bin\")")
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            tools.patch(**patch)
         cmake = self._configure_cmake()
         cmake.build()
 
@@ -67,6 +64,11 @@ class OpenmeshConan(ConanFile):
         cmake.install()
         tools.rmdir(os.path.join(self.package_folder, "libdata"))
         tools.rmdir(os.path.join(self.package_folder, "share"))
+        if self.settings.os != "Windows":
+            patterns_to_remove = ["*.a"] if self.options.shared else ["*.so*", "*.dylib"]
+            for pattern_to_remove in patterns_to_remove:
+                for lib_file in glob.glob(os.path.join(self.package_folder, "lib", pattern_to_remove)):
+                    os.remove(lib_file)
 
     def package_info(self):
         # TODO: components shouldn't be namespaced
