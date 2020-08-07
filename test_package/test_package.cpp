@@ -76,21 +76,5 @@ int main()
   face_vhandles.push_back(vhandle[4]);
   mesh.add_face(face_vhandles);
 
-
-  // write mesh to output.obj
-  try
-  {
-    if ( !OpenMesh::IO::write_mesh(mesh, "output.off") )
-    {
-      std::cerr << "Cannot write mesh to file 'output.off'" << std::endl;
-      return 1;
-    }
-  }
-  catch( std::exception& x )
-  {
-    std::cerr << x.what() << std::endl;
-    return 1;
-  }
-
   return 0;
 }
