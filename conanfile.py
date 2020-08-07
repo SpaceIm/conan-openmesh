@@ -13,14 +13,8 @@ class OpenmeshConan(ConanFile):
     exports_sources = "CMakeLists.txt"
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
-    options = {
-        "shared": [True, False],
-        "fPIC": [True, False]
-    }
-    default_options = {
-        "shared": False,
-        "fPIC": True
-    }
+    options = {"shared": [True, False], "fPIC": [True, False]}
+    default_options = {"shared": False, "fPIC": True}
 
     _cmake = None
 
@@ -47,6 +41,12 @@ class OpenmeshConan(ConanFile):
         os.rename("OpenMesh-" + self.version, self._source_subfolder)
 
     def build(self):
+        tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
+                              "if(\"${PROJECT_NAME}\" STREQUAL \"\")",
+                              "if(TRUE)")
+        tools.replace_in_file(os.path.join(self._source_subfolder, "cmake", "ACGCommon.cmake"),
+                              "set (ACG_PROJECT_BINDIR \".\")",
+                              "set (ACG_PROJECT_BINDIR \"bin\")")
         cmake = self._configure_cmake()
         cmake.build()
 
@@ -76,9 +76,15 @@ class OpenmeshConan(ConanFile):
         # OpenMeshCore
         self.cpp_info.components["openmeshcore"].names["cmake_find_package"] = "OpenMeshCore"
         self.cpp_info.components["openmeshcore"].names["cmake_find_package_multi"] = "OpenMeshCore"
-        self.cpp_info.components["openmeshcore"].libs = ["OpenMeshCore"]
+        self.cpp_info.components["openmeshcore"].libs = [self._get_decorated_lib("OpenMeshCore")]
         # OpenMeshTools
         self.cpp_info.components["openmeshtools"].names["cmake_find_package"] = "OpenMeshTools"
         self.cpp_info.components["openmeshtools"].names["cmake_find_package_multi"] = "OpenMeshTools"
-        self.cpp_info.components["openmeshtools"].libs = ["OpenMeshTools"]
+        self.cpp_info.components["openmeshtools"].libs = [self._get_decorated_lib("OpenMeshTools")]
         self.cpp_info.components["openmeshtools"].requires = ["openmeshcore"]
+
+    def _get_decorated_lib(self, name):
+        libname = name
+        if self.settings.build_type == "Debug":
+            libname += "d"
+        return libname
